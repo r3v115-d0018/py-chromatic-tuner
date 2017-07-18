@@ -1,9 +1,11 @@
+from __future__ import print_function
 import aubio
 import numpy as num
 import pyaudio
 import math
 import wave
 import time
+import sys
 
 #print("Hi")
 A4 = 440
@@ -23,8 +25,7 @@ def findnote(freq):
     h = round(12*math.log(freq/C0,2))
     octave = int(h // 12)
     n =int(h % 12)
-    return name[n] + str(octave)
-
+    return (name[n], octave)
 
 
 #PyAudio stream object.
@@ -53,54 +54,41 @@ while True:
     pitch = pDetection(samples)[0]
     # Compute the energy (volume) of the
     # current frame.
-    volume = num.sum(samples**2)/len(samples)
     # Format the volume output so that at most
     # it has six decimal numbers.
-    volume = "{:.6f}".format(volume)
-
 
     if pitch!= 0 and abs(prevpitch - pitch) > 1.5 :
         prevpitch = pitch
-	note = findnote(pitch)
-    	output = "Pitch:" + str(pitch) + "Hz Note:" + note +   " Volume: " + str(volume) + "            "
-        print output
+	note,octave = findnote(pitch)
+    	output = "Pitch:" + str(pitch) + "Hz Note:" + note + str(octave) + "            "
+        
 
-        #FIX FOR #
-	octave = int(note[1])
-        expected = octave0[note[0]] * pow(2, octave)
+        expected = octave0[note] * pow(2, octave)
         error = pitch - expected
         
-        margin = 0.5 * (pitch + pitch * pow(2,1.0/12))
         tolerance = 0.1
+        
+        if error > 0:
+            margin = 0.5 * (pitch * pow(2, 1.0 / 12) - pitch)
+        else:
+            margin = 0.5 * (pitch - pitch * pow(2,-1.0/12))
+        
+        
+        
         errorper = abs(error) / margin
         
         
-	if errorper <= tolerance:
-	    print "  .  .  .  ^  .  .  ."
+        if errorper <= tolerance:
+            print ("  .  .  .  ^  .  .  .  " + output + '\r',end = '')
         else:
-             counter = 1
-             spacing = 1.0/3
-             temp = spacing
-             while temp < 1:
-                 if temp < errorper:
-                     break;
-                 counter = counter + 1
-                 temp = temp + spacing
-             if error > 0:
-                 print "  .  .  .  |"
-                 for i in range(3):
-                     print "  "
-                     if i == counter:
-                         print "<"
-                     else:
-                         print "."
-             elif error < 0:
-                  counter = abs(counter - 4)
-                  for i in range(3):
-                      print "  "
-                      if i == counter:
-                          print ">"
-                      else:
-                          print "."
-                  print "  |  .  .  ."    
-
+            if error > 0:
+                pre = "  .  .  .  "
+                pos = int(math.ceil(3*errorper))
+                post = (pos - 1) * "  ." + "  <" + (3 - pos) * "  ."
+            else:
+                post = "  .  .  ."
+                pos = 3 - int(math.ceil(3*errorper)) + 1
+                pre = "  " + (pos - 1) * ".  " + ">  " + (3 - pos) * ".  "
+        
+            print (pre + "|" + post + "  " + output + '\r', end = '')
+	sys.stdout.flush()
