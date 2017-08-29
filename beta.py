@@ -66,7 +66,7 @@ while True:
     # Format the volume output so that at most
     # it has six decimal numbers.
 
-    #pitch = 427.76
+   #pitch = 427.76
 
     if pitch!= 0 and abs(prevpitch - pitch) > 1.5 :
         #prevpitch = 0
@@ -81,9 +81,9 @@ while True:
         tolerance = 0.1
         
         if error > 0:
-            margin = 0.5 * (pitch * pow(2, 1.0 / 12) - pitch)
+            margin = 0.5 * (expected * pow(2, 1.0 / 12) - expected)
         else:
-            margin = 0.5 * (pitch - pitch * pow(2,-1.0/12))
+            margin = 0.5 * (expected - expected * pow(2,-1.0/12))
         
         errorper = abs(error) / margin
         
