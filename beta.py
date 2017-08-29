@@ -66,14 +66,12 @@ while True:
     # Format the volume output so that at most
     # it has six decimal numbers.
 
-   #pitch = 427.76
-
     if pitch!= 0 and abs(prevpitch - pitch) > 1.5 :
-        #prevpitch = 0
         prevpitch = pitch
 	note,octave = findnote(pitch)
     	output = "Pitch:" + str(pitch) + "Hz Note:" + note + str(octave) + "            "
         
+        accuracy = 5
 
         expected = octave0[note] * pow(2, octave)
         error = pitch - expected
@@ -88,16 +86,16 @@ while True:
         errorper = abs(error) / margin
         
         if errorper <= tolerance:
-            print ("  .  .  ." + colorize("  ^  ", 0) + ".  .  .  " + output + '\r',end = '')
+            print (accuracy * "  ." + colorize("  ^  ", 0) + accuracy * ".  " + output + '\r',end = '')
         else:
             if error > 0:
-                pre = "  .  .  .  "
-                pos = int(math.ceil(3*errorper))
-                post = (pos - 1) * "  ." + colorize("  <", pos) + (3 - pos) * "  ."
+                pre = accuracy * "  ." + "  "
+                pos = int(math.ceil(accuracy*errorper))
+                post = (pos - 1) * "  ." + colorize("  <", pos) + (accuracy - pos) * "  ."
             else:
-                post = "  .  .  ."
-                pos = 3 - int(math.ceil(3*errorper)) + 1
-                pre = "  " + (pos - 1) * ".  " + colorize(">  ", 4 - pos) + (3 - pos) * ".  "
+                post = accuracy * "  ."
+                pos = accuracy - int(math.ceil(accuracy*errorper)) + 1
+                pre = "  " + (pos - 1) * ".  " + colorize(">  ", accuracy + 1 - pos) + (accuracy - pos) * ".  "
         
             print (pre + "|" + post + "  " + output + '\r', end = '')
 	sys.stdout.flush()
