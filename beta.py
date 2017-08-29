@@ -27,15 +27,16 @@ def findnote(freq):
     n =int(h % 12)
     return (name[n], octave)
 
-def colorize(string, position):
-    if position == 3:
-        return '\033[31m' + string + '\033[0m'
-    elif position == 2:
+def colorize(string, errorper, tolerance):
+    if errorper <= tolerance:
+	return '\033[32m' + string + '\033[0m'
+    elif errorper < 0.33:
+	return '\033[93m' + string + '\033[0m'
+    elif errorper < 0.66:
         return '\033[33m' + string + '\033[0m'
-    elif position == 1:
-        return '\033[93m' + string + '\033[0m'
     else:
-        return '\033[32m' + string + '\033[0m'
+        return '\033[91m' + string + '\033[0m'
+    
 
 #PyAudio stream object.
 p = pyaudio.PyAudio()
@@ -66,7 +67,8 @@ while True:
     # Format the volume output so that at most
     # it has six decimal numbers.
 
-    if pitch!= 0 and abs(prevpitch - pitch) > 1.5 :
+    if pitch!= 0: 
+	#and abs(prevpitch - pitch) > 0.5 :
         prevpitch = pitch
 	note,octave = findnote(pitch)
     	output = "Pitch:" + str(pitch) + "Hz Note:" + note + str(octave) + "            "
@@ -86,16 +88,16 @@ while True:
         errorper = abs(error) / margin
         
         if errorper <= tolerance:
-            print (accuracy * "  ." + colorize("  ^  ", 0) + accuracy * ".  " + output + '\r',end = '')
+            print (accuracy * "  ." + colorize("  ^  ", errorper, tolerance) + accuracy * ".  " + output + '\r',end = '')
         else:
             if error > 0:
                 pre = accuracy * "  ." + "  "
                 pos = int(math.ceil(accuracy*errorper))
-                post = (pos - 1) * "  ." + colorize("  <", pos) + (accuracy - pos) * "  ."
+                post = (pos - 1) * "  ." + colorize("  <", errorper, tolerance) + (accuracy - pos) * "  ."
             else:
                 post = accuracy * "  ."
                 pos = accuracy - int(math.ceil(accuracy*errorper)) + 1
-                pre = "  " + (pos - 1) * ".  " + colorize(">  ", accuracy + 1 - pos) + (accuracy - pos) * ".  "
+                pre = "  " + (pos - 1) * ".  " + colorize(">  ", errorper, tolerance) + (accuracy - pos) * ".  "
         
             print (pre + "|" + post + "  " + output + '\r', end = '')
 	sys.stdout.flush()
