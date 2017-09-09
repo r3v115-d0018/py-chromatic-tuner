@@ -81,9 +81,9 @@ while True:
         tolerance = 0.1
         
         if error > 0:
-            margin = 0.5 * (expected * pow(2, 1.0 / 12) - expected)
+            margin = expected * (pow(2,1.0/24) - 1)
         else:
-            margin = 0.5 * (expected - expected * pow(2,-1.0/12))
+            margin = expected * (1 - pow(2,-1.0/24))
         
         errorper = abs(error) / margin
         
