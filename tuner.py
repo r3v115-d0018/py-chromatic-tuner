@@ -7,7 +7,7 @@ import wave
 import time
 import sys
 
-#print("Hi")
+
 A4 = 440
 C0 = A4 * pow(2, -4.75)
 name = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -18,8 +18,6 @@ temp = C0
 for x in name:
     octave0[x] = temp
     temp = temp * pow(2, 1.0/12) 
-
-
 
 def findnote(freq):
     h = round(12*math.log(freq/C0,2))
@@ -52,7 +50,7 @@ pDetection = aubio.pitch("default", 2048,
     2048//2, 44100)
 # Set unit.
 pDetection.set_unit("Hz")
-pDetection.set_silence(-10)
+pDetection.set_silence(-20)
 
 prevpitch = 0
 
@@ -61,12 +59,12 @@ while True:
     samples = num.fromstring(data,
         dtype=aubio.float_type)
     pitch = pDetection(samples)[0]
-
+    
     # Compute the energy (volume) of the
     # current frame.
     # Format the volume output so that at most
     # it has six decimal numbers.
-
+    
     if pitch!= 0: 
 	#and abs(prevpitch - pitch) > 0.5 :
         prevpitch = pitch
@@ -86,7 +84,9 @@ while True:
             margin = expected * (1 - pow(2,-1.0/24))
         
         errorper = abs(error) / margin
-        
+        if  errorper > 1:
+            print("Error greater than 100% at pitch : " + pitch)
+            exit()
         if errorper <= tolerance:
             print (accuracy * "  ." + colorize("  ^  ", errorper, tolerance) + accuracy * ".  " + output + '\r',end = '')
         else:
