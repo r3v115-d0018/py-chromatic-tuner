@@ -1,74 +1,30 @@
 from __future__ import print_function
-import aubio
+import pyaudio, aubio, wave
+import sys, time, getopt
 import numpy as num
-import pyaudio
 import math
-import wave
-import time
-import sys
-
+import utility
 
 A4 = 440
 C0 = A4 * pow(2, -4.75)
-name = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 octave0 = {}
 
 temp = C0
-for x in name:
+for x in utility.name:
     octave0[x] = temp
     temp = temp * pow(2, 1.0/12) 
 
-def findnote(freq):
-    h = round(12*math.log(freq/C0,2))
-    octave = int(h // 12)
-    n =int(h % 12)
-    return (name[n], octave)
-
-def colorize(string, errorper, tolerance):
-    if errorper <= tolerance:
-	return '\033[32m' + string + '\033[0m'
-    elif errorper < 0.33:
-	return '\033[93m' + string + '\033[0m'
-    elif errorper < 0.66:
-        return '\033[33m' + string + '\033[0m'
-    else:
-        return '\033[91m' + string + '\033[0m'
-    
-
-#PyAudio stream object.
-p = pyaudio.PyAudio()
-
-#Open the stream.
-
-stream = p.open(format=pyaudio.paFloat32,
-		channels=1,rate=44100,input=True,
-		frames_per_buffer=1024)
-
-# Aubio's pitch detection.
-pDetection = aubio.pitch("default", 2048,
-    2048//2, 44100)
-# Set unit.
-pDetection.set_unit("Hz")
-pDetection.set_silence(-20)
-
-prevpitch = 0
+stream = utility.initStream()
+pDetector = utility.initDetector()
 
 while True:
     data = stream.read(1024)
-    samples = num.fromstring(data,
-        dtype=aubio.float_type)
-    pitch = pDetection(samples)[0]
-    
-    # Compute the energy (volume) of the
-    # current frame.
-    # Format the volume output so that at most
-    # it has six decimal numbers.
+    samples = num.fromstring(data, dtype=aubio.float_type)
+    pitch = pDetector(samples)[0]
     
     if pitch!= 0: 
-	#and abs(prevpitch - pitch) > 0.5 :
-        prevpitch = pitch
-	note,octave = findnote(pitch)
+	note,octave = utility.findnote(pitch, C0)
     	output = "Pitch:" + str(pitch) + "Hz Note:" + note + str(octave) + "            "
         
         accuracy = 5
@@ -88,16 +44,16 @@ while True:
             print("Error greater than 100% at pitch : " + pitch)
             exit()
         if errorper <= tolerance:
-            print (accuracy * "  ." + colorize("  ^  ", errorper, tolerance) + accuracy * ".  " + output + '\r',end = '')
+            print (accuracy * "  ." + utility.colorize("  ^  ", errorper, tolerance) + accuracy * ".  " + output + '\r',end = '')
         else:
             if error > 0:
                 pre = accuracy * "  ." + "  "
                 pos = int(math.ceil(accuracy*errorper))
-                post = (pos - 1) * "  ." + colorize("  <", errorper, tolerance) + (accuracy - pos) * "  ."
+                post = (pos - 1) * "  ." + utility.colorize("  <", errorper, tolerance) + (accuracy - pos) * "  ."
             else:
                 post = accuracy * "  ."
                 pos = accuracy - int(math.ceil(accuracy*errorper)) + 1
-                pre = "  " + (pos - 1) * ".  " + colorize(">  ", errorper, tolerance) + (accuracy - pos) * ".  "
+                pre = "  " + (pos - 1) * ".  " + utility.colorize(">  ", errorper, tolerance) + (accuracy - pos) * ".  "
         
             print (pre + "|" + post + "  " + output + '\r', end = '')
 	sys.stdout.flush()
