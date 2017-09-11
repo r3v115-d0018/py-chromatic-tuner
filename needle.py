@@ -39,7 +39,10 @@ class Needle:
         right = list(green.range_to(red, 10))
         left = list(red.range_to(green, 10))
 
+
         self.__colors = left[:9] + right
+
+        print(len(self.__colors))
 
 
     def initNeedle(self):
@@ -69,7 +72,7 @@ class Needle:
         
         no_steps = 20
 
-        self.__trans_rate = int(float(x - self.__curPos["x"])/no_steps)
+        self.__trans_rate = float(x - self.__curPos["x"])/no_steps
         self.__color_rate = float(final_color - self.__curColorIndex)/no_steps
         
         self.move()
@@ -83,16 +86,23 @@ class Needle:
 
         rate = self.__trans_rate
 
-        if int(math.fabs(diff)) > int(math.fabs(rate)) and rate != 0:
+        if math.fabs(diff) > math.fabs(rate) and rate != 0:
             self.__curPos["x"] = self.__curPos["x"]     + rate
             self.__curColorIndex = self.__curColorIndex + self.__color_rate
 
             x = self.__curPos["x"]
             colorIndex = self.__curColorIndex
+            print("Color index: {}, color rate: {}, trans_rate: {}".format(colorIndex,
+                                                                           self.__color_rate,
+                                                                           self.__trans_rate))
 
             self.draw(x, self.__colors[int(colorIndex)]) 
         else:
+            print("Color index: {}, color rate: {}, trans_rate: {}".format(self.__newColorIndex,
+                                                                           self.__color_rate,
+                                                                           self.__trans_rate))
             self.draw(self.__newPos["x"], self.__colors[int(self.__newColorIndex)])
+            self.__curColorIndex = self.__newColorIndex
             self.__curPos["x"] = self.__newPos["x"]
 
     def getX(self):

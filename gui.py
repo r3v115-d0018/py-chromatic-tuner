@@ -73,6 +73,8 @@ class App:
             newX = int(self.__width/2 - (3.0*self.__width/8)*errorper)
             colorIndex = 9 - colorIndex
 
+        print("Color index: " + str(colorIndex) + " errorper: " + str(errorper) + "error: " + str(error))
+
         self.__needle.update(newX, colorIndex)
 
     def run(self):
