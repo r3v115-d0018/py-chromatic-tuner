@@ -42,9 +42,6 @@ class Needle:
 
         self.__colors = left[:9] + right
 
-        print(len(self.__colors))
-
-
     def initNeedle(self):
         width  = self.__width
         height = self.__height
@@ -92,15 +89,9 @@ class Needle:
 
             x = self.__curPos["x"]
             colorIndex = self.__curColorIndex
-            print("Color index: {}, color rate: {}, trans_rate: {}".format(colorIndex,
-                                                                           self.__color_rate,
-                                                                           self.__trans_rate))
 
             self.draw(x, self.__colors[int(colorIndex)]) 
         else:
-            print("Color index: {}, color rate: {}, trans_rate: {}".format(self.__newColorIndex,
-                                                                           self.__color_rate,
-                                                                           self.__trans_rate))
             self.draw(self.__newPos["x"], self.__colors[int(self.__newColorIndex)])
             self.__curColorIndex = self.__newColorIndex
             self.__curPos["x"] = self.__newPos["x"]
