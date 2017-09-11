@@ -2,6 +2,7 @@ from Tkinter import *
 from colour import Color
 import tuner
 import math
+import needle
 
 class App:
     __tuner = None
@@ -42,61 +43,50 @@ class App:
 
         self.__canvas.grid(row=0,column=0)
         self.__text_info.grid(row=1,column=0)
-        self.drawBar()
-        self.drawNeedle()
 
-        self.initColors()
+        self.__needle = needle.Needle(self.__master, self.__canvas, width, height)
+        self.drawBar()
 
     def update(self):
-        errorper, error, pitch, note, octave = self.__tuner.getData() 
+        if self.__needle.inTransit():
+            self.__needle.move()
+        else:
+            errorper, error, pitch, note, octave = self.__tuner.getData() 
 
-        if pitch != 0:
-            self.updateInfo(pitch, note, octave)
-            self.updateNeedle(errorper, error)
+            if pitch != 0:
+                self.updateInfo(pitch, note, octave)
+                self.updateNeedle(errorper, error)
 
-        self.__master.after(10, self.update)
+        self.__master.after(1, self.update)
     
     def updateInfo(self, pitch, note, octave):
         self.__info_content.set("Pitch: {:.2f} Hz Note: {}{}".format(pitch, note, octave))
 
     def updateNeedle(self, errorper, error):
         colorIndex = int(10*errorper)
-        if error > 0:
-            newX = self.__width/2 + (3.0*self.__width/8)*errorper
-            newY = self.__height/2
-            self.__canvas.coords(self.__needle, newX, newY,
-                                                newX, newY - 15)
-            self.__canvas.itemconfig(self.__needle, fill=self.__colors[colorIndex])
-        else:
-            newX = self.__width/2 - (3.0*self.__width/8)*errorper
-            newY = self.__height/2
-            self.__canvas.coords(self.__needle, newX, newY,
-                                                newX, newY - 15)
-            self.__canvas.itemconfig(self.__needle, fill=self.__colors[colorIndex])
+        newX = 0
 
-    def initColors(self):
-        green = Color("green")
-        self.__colors = list(green.range_to(Color("red"), 10)) 
+        if error > 0:
+            newX = int(self.__width/2 + (3.0*self.__width/8)*errorper)
+            colorIndex += 9
+        else:
+            newX = int(self.__width/2 - (3.0*self.__width/8)*errorper)
+            colorIndex = 9 - colorIndex
+
+        self.__needle.update(newX, colorIndex)
+
+    def run(self):
+        self.__master.after(1, self.update)
+        self.__master.mainloop()
 
     def drawBar(self):
         self.__canvas.create_line(1.0/8 * self.__width, self.__height/2,
                                   7.0/8 * self.__width, self.__height/2,
                                   width = 2.0)
         self.__canvas.create_line(self.__width/2, self.__height/2,
-                                                  self.__width/2, self.__height/2 - 20,
-                                                  fill="black",
-                                                  width=2.0)
-
-    def drawNeedle(self):
-        self.__needle = self.__canvas.create_line(self.__width/2, self.__height/2,
-                                                  self.__width/2, self.__height/2 - 15,
-                                                  fill="green",
-                                                  width=2.0)
-
-
-    def run(self):
-        self.__master.after(10, self.update)
-        self.__master.mainloop()
+                                  self.__width/2, self.__height/2 - 20,
+                                  fill="black",
+                                  width=2.0)
 
 app = App(width=400, height=281)
 app.run()
