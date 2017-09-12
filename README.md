@@ -15,7 +15,7 @@ This project, requires the following python modules and libraries:
 To download and run the project, simply:
 ```
 $ git clone https://github.com/iliastsa/py-chromatic-tuner.git
-$ cd music-trainer
+$ cd py-chromatic-tuner
 $ cd src
 $ python gui.py
 ```
