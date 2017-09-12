@@ -1,5 +1,5 @@
 # Python chromatic tuner
-A simple, but working chromatic tuner, in Python.
+A simple but functional chromatic tuner, implemented in Python.
 ![Demo](https://github.com/iliastsa/py-chromatic-tuner/blob/master/demo/demo.gif "Tuner")
 
 # Dependencies
