@@ -6,8 +6,8 @@ import math
 import utility
 
 class Tuner:
-    __A4 = None
-    __C0 = None
+    __A4 = 440
+    __C0 = 0
     __base_octave = {}
     __data_stream = None
     __pitch_detector = None
@@ -32,11 +32,12 @@ class Tuner:
             self.__base_octave[x] = temp
             temp = temp * pow(2, 1.0/12) 
 
-    def setA4(A4):
+    def setA4(self, A4):
         self.__A4 = A4
         self.calculateC0()
+        self.initBaseOctave()
 
-    def getA4():
+    def getA4(self):
         return self.__A4
 
     def getData(self):

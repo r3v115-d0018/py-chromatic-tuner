@@ -1,6 +1,8 @@
 from Tkinter import *
 from colour import Color
+from PIL import Image, ImageTk
 import tuner
+import dialog
 import math
 import threading
 import needle
@@ -18,12 +20,13 @@ class App:
     __needle = None
     __colors = []
 
-
     errorper = 0.0
     error = 0.0
     pitch = 0.0
     note = ""
     octave = 0
+
+    photo = None
 
     listen_t = None
     running = True
@@ -44,7 +47,10 @@ class App:
         pos = "+{}+{}".format(screen_w/2-self.__width/2,
                               screen_h/2-self.__height/2)
 
+        self.__master.title("Chromatic tuner")
+
         self.__master.geometry(pos)
+        self.__master.resizable(False, False)
         self.__accuracy = accuracy
 
         self.__info_content = StringVar()
@@ -52,13 +58,37 @@ class App:
 
         self.__canvas = Canvas(self.__master, width=self.__width, height=self.__height)
 
-        self.__canvas.grid(row=0,column=0)
-        self.__text_info.grid(row=1,column=0)
+        image = Image.open("../assets/gears.png")
+        image = image.resize((35, 35), Image.ANTIALIAS)
+        self.image = ImageTk.PhotoImage(image)
+
+        self.button = Button(self.__master, command=self.settings)
+        self.button.config(image=self.image)
+        self.button.grid(row=0,column=0, sticky=W)
+
+        self.__c_freq = StringVar()
+        self.updateCfreq()
+        
+        Label(self.__master, 
+              textvariable=self.__c_freq,
+              font="Helvetica 16 bold"
+              ).grid(row=0, column=0)
+
+        self.__canvas.grid(row=1,column=0)
+        self.__text_info.grid(row=2,column=0)
 
         self.__needle = needle.Needle(self.__master, self.__canvas, width, height)
         self.drawBar()
         self.listen_t = threading.Thread(target=self.read,args=())
         self.listen_t.start()
+
+    def updateCfreq(self):
+        self.__c_freq.set("A4 = {} Hz".format(self.__tuner.getA4()))
+    
+    def settings(self):
+        w = dialog.Settings(self.__master)
+        self.__tuner.setA4(w.result)
+        self.updateCfreq()
 
     def read(self):
         while self.running:
@@ -110,5 +140,5 @@ class App:
                                   fill="black",
                                   width=2.0)
 
-app = App(width=400, height=281)
+app = App(width=500, height=281)
 app.run()
