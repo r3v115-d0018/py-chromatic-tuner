@@ -1,6 +1,6 @@
 # Python chromatic tuner
 A simple, but working chromatic tuner, in Python.
-![Demo](https://github.com/iliastsa/music-trainer/blob/master/demo/demo.gif "Tuner")
+![Demo](https://github.com/iliastsa/py-chromatic-tuner/blob/master/demo/demo.gif "Tuner")
 
 # Dependencies
 This project, requires the following python modules and libraries:
