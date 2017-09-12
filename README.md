@@ -1,5 +1,5 @@
-# Game of Life w/ SFML
-C++ implementation of Conaway's Game of Life, using SFML
+# Python chromatic tuner
+A simple, but working chromatic tuner, in Python.
 ![Demo](https://github.com/iliastsa/music-trainer/blob/master/demo/demo.gif "Tuner")
 
 # Dependencies
