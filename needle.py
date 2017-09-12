@@ -67,7 +67,7 @@ class Needle:
         self.__newPos["x"] = x
         self.__newColorIndex = final_color
         
-        no_steps = 20
+        no_steps = 100
 
         self.__trans_rate = float(x - self.__curPos["x"])/no_steps
         self.__color_rate = float(final_color - self.__curColorIndex)/no_steps

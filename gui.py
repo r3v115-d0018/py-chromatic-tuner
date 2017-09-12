@@ -2,6 +2,7 @@ from Tkinter import *
 from colour import Color
 import tuner
 import math
+import threading
 import needle
 
 class App:
@@ -16,6 +17,16 @@ class App:
 
     __needle = None
     __colors = []
+
+
+    errorper = 0.0
+    error = 0.0
+    pitch = 0.0
+    note = ""
+    octave = 0
+
+    listen_t = None
+    running = True
 
     __height = None
     __width = None
@@ -46,12 +57,22 @@ class App:
 
         self.__needle = needle.Needle(self.__master, self.__canvas, width, height)
         self.drawBar()
+        self.listen_t = threading.Thread(target=self.read,args=())
+        self.listen_t.start()
+
+    def read(self):
+        while self.running:
+            self.errorper, self.error, self.pitch, self.note, self.octave = self.__tuner.getData() 
 
     def update(self):
         if self.__needle.inTransit():
             self.__needle.move()
         else:
-            errorper, error, pitch, note, octave = self.__tuner.getData() 
+            errorper = self.errorper
+            error=self.error
+            pitch= self.pitch
+            note = self.note 
+            octave = self.octave
 
             if pitch != 0:
                 self.updateInfo(pitch, note, octave)
@@ -78,6 +99,7 @@ class App:
     def run(self):
         self.__master.after(1, self.update)
         self.__master.mainloop()
+        self.running = False
 
     def drawBar(self):
         self.__canvas.create_line(1.0/8 * self.__width, self.__height/2,
