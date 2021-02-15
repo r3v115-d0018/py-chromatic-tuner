@@ -1,0 +1,5 @@
+"py-chromatic-tuner" requires python 2.7 and Ubuntu/Debian like Linux
+
+Run below command to install required dependencies:
+
+"sudo apt update && sudo apt install python python-pip python-tk python-pyaudio python-aubio && pip install colour Pillow aubio"
