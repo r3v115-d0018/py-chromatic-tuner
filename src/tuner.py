@@ -1,7 +1,5 @@
 from __future__ import print_function
-import pyaudio, aubio, wave
-import sys, time, getopt
-import numpy as num
+import sys
 import math
 import utility
 
@@ -40,10 +38,22 @@ class Tuner:
     def getA4(self):
         return self.__A4
 
-    def getData(self):
-        data = self.__data_stream.read(1024)
-        samples = num.fromstring(data, dtype=aubio.float_type)
-        pitch = self.__pitch_detector(samples)[0]
+    def getDataStream(self):
+        return self.__data_stream
+
+    def getData(self, data):
+        # data = self.__data_stream.read(1024)
+        # print("Some logging data :)")
+        # print(data)
+        # samples = num.fromstring(data, dtype=aubio.float_type)
+        # print(samples)
+        # samples = data
+        # print(len(data[:,0]))
+        # print(data)
+        pitch = self.__pitch_detector(data)[0]
+        # if pitch == 0.0:
+        #     print(len(data))
+        print(pitch)
 
         errorper = 0
         error= 0

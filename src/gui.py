@@ -3,7 +3,6 @@ from colour import Color
 from PIL import Image, ImageTk
 import tuner
 import dialog
-import math
 import threading
 import needle
 
@@ -34,7 +33,7 @@ class App:
     __height = None
     __width = None
 
-    def __init__(self, width, height, A4 = 440, tolerance = 0.1, accuracy = 5):
+    def __init__(self, width, height, A4 = 432, tolerance = 0.1, accuracy = 5):
         self.__tuner = tuner.Tuner(A4, tolerance, accuracy)
         self.__master = Tk()
 
@@ -80,6 +79,7 @@ class App:
         self.__needle = needle.Needle(self.__master, self.__canvas, width, height)
         self.drawBar()
         self.listen_t = threading.Thread(target=self.read,args=())
+        self.listen_t.daemon = True
         self.listen_t.start()
 
     def updateCfreq(self):
@@ -91,8 +91,37 @@ class App:
         self.updateCfreq()
 
     def read(self):
-        while self.running:
-            self.errorper, self.error, self.pitch, self.note, self.octave = self.__tuner.getData() 
+        # CHUNK = 1024
+        # wf = self.__tuner.getDataStream()
+        # data = wf.readframes(CHUNK)
+        src = self.__tuner.getDataStream()
+        # blocks_len = len(blocks)
+        # i = 0
+
+        while True and self.running:
+            samples, read = src()
+
+            self.errorper, self.error, self.pitch, self.note, self.octave = self.__tuner.getData(samples)
+            # break
+            if read < src.hop_size:
+                break
+
+        src.close()
+        self.__master.destroy()
+
+        # for block in blocks:
+        #     if not self.running:
+        #         break
+        #     self.errorper, self.error, self.pitch, self.note, self.octave = self.__tuner.getData(block)
+            # break
+            # i += 1
+
+        # while len(data) > 0 and self.running:
+        #     self.errorper, self.error, self.pitch, self.note, self.octave = self.__tuner.getData(data)
+        #     break
+        #     data = wf.readframes(CHUNK)
+
+        # wf.close()
 
     def update(self):
         if self.__needle.inTransit():
